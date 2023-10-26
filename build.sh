@@ -1,2 +1,2 @@
 #!/bin/bash
-cc main.c `pkg-config --libs --cflags raylib` -o Game
+cc main.c level.c `pkg-config --libs --cflags raylib` -o Game

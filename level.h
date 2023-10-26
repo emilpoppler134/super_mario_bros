@@ -3,6 +3,10 @@
 
 #include "raylib.h"
 
+#define ROWS 16
+#define TILE_SIZE 16
+#define LEVEL_COLS 1600
+
 typedef enum tile_type_e
 {
   // Row 1
@@ -43,7 +47,15 @@ typedef enum tile_type_e
   TILE_FLAG_MIDDLE,
   TILE_FLAG_TOP,
 
+  TILE_SKY,
   TILE_NUM_TYPES
 } tile_type_e;
+
+typedef struct level_t
+{
+  tile_type_e tilemap[ROWS][LEVEL_COLS];
+} level_t;
+
+level_t init_level();
 
 #endif
