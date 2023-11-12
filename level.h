@@ -1,15 +1,23 @@
 #ifndef __TILES_H__
 #define __TILES_H__
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <math.h>
+#include <time.h>
+
 #include "raylib.h"
 
-#define ROWS 16
+#define ROWS 15
 #define TILE_SIZE 16
 #define LEVEL_COLS 1600
+#define CHUNK_COLS 8
 
 typedef enum tile_type_e
 {
   // Row 1
+  TILE_SKY,
   TILE_GROUND,
   TILE_GRASS_LEFT,
   TILE_GRASS_MIDDLE,
@@ -47,7 +55,6 @@ typedef enum tile_type_e
   TILE_FLAG_MIDDLE,
   TILE_FLAG_TOP,
 
-  TILE_SKY,
   TILE_NUM_TYPES
 } tile_type_e;
 
@@ -56,6 +63,22 @@ typedef struct level_t
   tile_type_e tilemap[ROWS][LEVEL_COLS];
 } level_t;
 
+typedef struct chunk_t
+{
+  int tiles[ROWS][CHUNK_COLS];
+} chunk_t;
+
+typedef struct dynamic_chunk_array
+{
+  chunk_t* data;
+  int count;
+  int capacity;
+} dynamic_chunk_array;
+
 level_t init_level();
+void load_chunk(level_t *level, int highest_tile);
+dynamic_chunk_array deserialize_terrain();
+
+dynamic_chunk_array terrain;
 
 #endif

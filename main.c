@@ -33,7 +33,6 @@ int main()
 
   ToggleFullscreen();
   SetTargetFPS(60);
-
   //SetExitKey(KEY_X);
 
   RenderTexture2D canvas = LoadRenderTexture(256, 240);
@@ -44,16 +43,32 @@ int main()
 
   level_t level = init_level();
 
+  int start = 8;
+  float offset = 0.0f;
+  float playerSpeed = -1.4f;
+
   player_t player = {
     .velocity = (Vector2){0, 0},
-    .position = (Vector2){256 / 2, 240 - 64},
+    .position = (Vector2){start * TILE_SIZE, 240 - 64},
     .hp = 100
   };
 
-  int start = 0;
+  int highest_tile = 3 * CHUNK_COLS;
+
+  bool go_right = false;
+  bool go_left = false;
 
   while(!WindowShouldClose())
   {
+    if (IsKeyUp(KEY_D))
+    {
+      go_right = false;
+    }
+    if (IsKeyUp(KEY_A))
+    {
+      go_left = false;
+    }
+
     // Input
     //--------------------------------------------------------------------------------------
     player.velocity.x = 0;
@@ -66,7 +81,19 @@ int main()
       if (tile_x > 10)
       {
         start++;
+        offset = 0;
+        go_right = true;
         player.position.x -= 10;
+
+        if (start + 3 + CHUNK_COLS > highest_tile)
+        {
+          if (highest_tile % CHUNK_COLS == 0)
+          {
+            int current_chunk = floor(highest_tile / CHUNK_COLS);
+            load_chunk(&level, current_chunk + 1);
+          }
+          highest_tile = start + 3 + CHUNK_COLS;
+        }
       }
     }
 
@@ -78,6 +105,8 @@ int main()
       if (tile_x < 4)
       {
         start--;
+        offset = 0;
+        go_left = true;
         player.position.x += 10;
       }
     }
@@ -88,6 +117,15 @@ int main()
 
     // Update
     //--------------------------------------------------------------------------------------
+
+    if (go_right)
+    {
+      offset += playerSpeed;
+    }
+    if (go_left)
+    {
+      offset -= playerSpeed;
+    }
 
     // Apply gravity to vertical velocity
     player.velocity.y += GRAVITY;
@@ -114,10 +152,10 @@ int main()
 
         int screen_x = 0;
 
-        for (int x = start; x < end; x++) {
+        for (int x = start; x < end + 1; x++) {
           int tile = level.tilemap[y][x];
 
-          float dest_x = screen_x * TILE_SIZE;
+          float dest_x = screen_x * TILE_SIZE + offset;
 
           Rectangle dest_rect = {dest_x, y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
           Rectangle source_rect = {(tile % (tileset.width / TILE_SIZE)) * TILE_SIZE, (tile / (tileset.width / TILE_SIZE)) * TILE_SIZE, TILE_SIZE, TILE_SIZE };
